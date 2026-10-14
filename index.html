@@ -1,1 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Shipment Tracking Portal</title>
 
+<style>
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f3f5f8;
+  color: #202b3c;
+}
+
+header {
+  background: #152b50;
+  color: white;
+  padding: 24px 16px;
+  text-align: center;
+}
+
+header h1 {
+  margin: 0 0 8px;
+  font-size: 25px;
+}
+
+header p {
+  margin: 0;
+  color: #dce7f8;
+}
+
+main {
+  max-width: 600px;
+  margin: 35px auto;
+  padding: 0 16px;
+}
+
+.card {
+  background: white;
+  padding: 25px;
+  border-radius: 12px;
+  box-shadow: 0 3px 15px #00000012;
+}
+
+h2 {
+  margin-top: 0;
+}
+
+label {
+  display: block;
+  margin: 18px 0 8px;
+  font-weight: bold;
+}
+
+input {
+  width: 100%;
+  padding: 14px;
+  border: 1px solid #cbd3df;
+  border-radius: 7px;
+  font-size: 16px;
+}
+
+button {
+  width: 100%;
+  padding: 14px;
+  margin-top: 14px;
+  border: none;
+  border-radius: 7px;
+  background: #1757a6;
+  color: white;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+button:hover {
+  background: #104581;
+}
+
+.notice {
+  margin-top: 18px;
+  padding: 12px;
+  border-radius: 7px;
+  background: #fff5d9;
+  color: #70520a;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+#result {
+  display: none;
+  margin-top: 22px;
+  padding: 18px;
+  border: 1px solid #dce3ed;
+  border-radius: 8px;
+}
+
+.status {
+  display: inline-block;
+  background: #e4f4e8;
+  color: #176532;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-weight: bold;
+  font-size: 13px;
+}
+
+.detail {
+  padding: 12px 0;
+  border-bottom: 1px solid #edf0f4;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+footer {
+  text-align: center;
+  padding: 25px 15px;
+  color: #667085;
+  font-size: 13px;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>Shipment Tracking Portal</h1>
+  <p>Track your shipment information</p>
+</header>
+
+<main>
+  <section class="card">
+    <h2>Track Your Package</h2>
+    <p>Enter your tracking number below to look up a registered shipment.</p>
+
+    <form id="trackingForm">
+      <label for="trackingCode">Tracking Number</label>
+      <input
+        id="trackingCode"
+        type="text"
+        placeholder="Enter tracking number"
+        required
+      >
+      <button type="submit">Track Shipment</button>
+    </form>
+
+    <div class="notice">
+      This is a demonstration interface. Live shipment tracking
+      requires a secure shipment database or an authorized courier API.
+      No live courier connection is currently configured.
+    </div>
+
+    <div id="result" aria-live="polite"></div>
+  </section>
+</main>
+
+<footer>
+  Shipment Tracking Portal · Demonstration
+</footer>
+
+<script>
+const form = document.getElementById("trackingForm");
+const result = document.getElementById("result");
+
+form.addEventListener("submit", function(event) {
+  event.preventDefault();
+
+  const code = document
+    .getElementById("trackingCode")
+    .value.trim();
+
+  result.style.display = "block";
+
+  result.innerHTML = "";
+
+  const message = document.createElement("p");
+
+  message.textContent =
+    "No live shipment record was found for tracking number: " + code;
+
+  result.appendChild(message);
+
+  const explanation = document.createElement("p");
+
+  explanation.textContent =
+    "This website is not yet connected to a shipment database. " +
+    "Connect a secure database to display verified shipment status, " +
+    "shipment history and estimated delivery dates.";
+
+  result.appendChild(explanation);
+});
+</script>
+
+</body>
+</html>
