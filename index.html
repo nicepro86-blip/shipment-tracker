@@ -3,125 +3,114 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Shipment Tracking Portal</title>
+<title>Shipment Tracker</title>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <style>
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
-  margin: 0;
-  font-family: Arial, sans-serif;
-  background: #f3f5f8;
-  color: #202b3c;
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f3f6fb;
+    color: #172033;
 }
 
 header {
-  background: #152b50;
-  color: white;
-  padding: 24px 16px;
-  text-align: center;
+    background: #10284c;
+    color: white;
+    padding: 25px 16px;
+    text-align: center;
 }
 
-header h1 {
-  margin: 0 0 8px;
-  font-size: 25px;
-}
-
-header p {
-  margin: 0;
-  color: #dce7f8;
-}
+header h1 { margin: 0 0 8px; }
+header p { margin: 0; color: #d8e4f5; }
 
 main {
-  max-width: 600px;
-  margin: 35px auto;
-  padding: 0 16px;
+    max-width: 800px;
+    margin: 25px auto;
+    padding: 0 14px;
 }
 
 .card {
-  background: white;
-  padding: 25px;
-  border-radius: 12px;
-  box-shadow: 0 3px 15px #00000012;
+    background: white;
+    padding: 22px;
+    margin-bottom: 20px;
+    border-radius: 12px;
+    box-shadow: 0 3px 14px #0000000c;
 }
 
-h2 {
-  margin-top: 0;
+h2 { margin-top: 0; }
+
+input, select, button {
+    width: 100%;
+    padding: 12px;
+    margin: 7px 0;
+    border-radius: 7px;
+    font-size: 16px;
 }
 
-label {
-  display: block;
-  margin: 18px 0 8px;
-  font-weight: bold;
-}
-
-input {
-  width: 100%;
-  padding: 14px;
-  border: 1px solid #cbd3df;
-  border-radius: 7px;
-  font-size: 16px;
+input, select {
+    border: 1px solid #cbd5e1;
+    background: white;
 }
 
 button {
-  width: 100%;
-  padding: 14px;
-  margin-top: 14px;
-  border: none;
-  border-radius: 7px;
-  background: #1757a6;
-  color: white;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
+    border: 0;
+    background: #1757a6;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
 }
 
-button:hover {
-  background: #104581;
+button:disabled { opacity: .6; }
+
+.secondary {
+    background: #64748b;
 }
 
-.notice {
-  margin-top: 18px;
-  padding: 12px;
-  border-radius: 7px;
-  background: #fff5d9;
-  color: #70520a;
-  font-size: 13px;
-  line-height: 1.5;
+.danger {
+    background: #b42318;
 }
 
-#result {
-  display: none;
-  margin-top: 22px;
-  padding: 18px;
-  border: 1px solid #dce3ed;
-  border-radius: 8px;
+.result {
+    margin-top: 15px;
+    padding: 14px;
+    background: #eef5ff;
+    border-radius: 8px;
+    overflow-wrap: anywhere;
 }
 
-.status {
-  display: inline-block;
-  background: #e4f4e8;
-  color: #176532;
-  padding: 8px 12px;
-  border-radius: 20px;
-  font-weight: bold;
-  font-size: 13px;
+.hidden { display: none !important; }
+
+.admin-link {
+    display: block;
+    width: fit-content;
+    margin: 20px auto;
+    padding: 8px;
+    background: transparent;
+    color: #64748b;
+    font-size: 13px;
 }
 
-.detail {
-  padding: 12px 0;
-  border-bottom: 1px solid #edf0f4;
-  line-height: 1.5;
-  overflow-wrap: anywhere;
+.shipment {
+    border: 1px solid #dbe3ee;
+    border-radius: 8px;
+    padding: 14px;
+    margin: 12px 0;
+    overflow-wrap: anywhere;
+}
+
+.small {
+    color: #64748b;
+    font-size: 13px;
 }
 
 footer {
-  text-align: center;
-  padding: 25px 15px;
-  color: #667085;
-  font-size: 13px;
+    text-align: center;
+    padding: 25px;
+    color: #64748b;
 }
 </style>
 </head>
@@ -129,71 +118,427 @@ footer {
 <body>
 
 <header>
-  <h1>Shipment Tracking Portal</h1>
-  <p>Track your shipment information</p>
+    <h1>Shipment Tracker</h1>
+    <p>Track your parcel securely and conveniently.</p>
 </header>
 
 <main>
-  <section class="card">
-    <h2>Track Your Package</h2>
-    <p>Enter your tracking number below to look up a registered shipment.</p>
+
+<section class="card" id="trackingSection">
+    <h2>Track Your Shipment</h2>
+    <p>Enter the tracking code provided by the sender.</p>
 
     <form id="trackingForm">
-      <label for="trackingCode">Tracking Number</label>
-      <input
-        id="trackingCode"
-        type="text"
-        placeholder="Enter tracking number"
-        required
-      >
-      <button type="submit">Track Shipment</button>
+        <input id="trackingCode"
+               placeholder="Enter tracking code"
+               required>
+        <button type="submit">Track Shipment</button>
     </form>
 
-    <div class="notice">
-      This is a demonstration interface. Live shipment tracking
-      requires a secure shipment database or an authorized courier API.
-      No live courier connection is currently configured.
-    </div>
+    <div id="trackingResult" aria-live="polite"></div>
+</section>
 
-    <div id="result" aria-live="polite"></div>
-  </section>
+<button class="admin-link" id="openAdmin" type="button">
+    Administrator Login
+</button>
+
+<section class="card hidden" id="loginSection">
+    <h2>Administrator Login</h2>
+    <p class="small">Authorized account holders only.</p>
+
+    <form id="loginForm">
+        <input id="adminEmail"
+               type="email"
+               placeholder="Administrator email"
+               autocomplete="username"
+               required>
+
+        <input id="adminPassword"
+               type="password"
+               placeholder="Password"
+               autocomplete="current-password"
+               required>
+
+        <button type="submit">Log In</button>
+        <button type="button" class="secondary" id="cancelLogin">
+            Cancel
+        </button>
+    </form>
+
+    <div id="loginMessage" aria-live="polite"></div>
+</section>
+
+<section class="card hidden" id="adminPanel">
+    <h2>Shipment Administration</h2>
+    <p>You are logged in as an administrator.</p>
+
+    <button type="button" class="secondary" id="logoutButton">
+        Log Out
+    </button>
+
+    <hr>
+
+    <h3>Create a Shipment</h3>
+
+    <form id="shipmentForm">
+        <input id="customerName"
+               placeholder="Customer name"
+               required>
+
+        <input id="parcelDescription"
+               placeholder="Parcel description (optional)">
+
+        <input id="origin"
+               placeholder="Origin (optional)">
+
+        <input id="destination"
+               placeholder="Destination"
+               required>
+
+        <select id="shipmentStatus">
+            <option>Shipment Registered</option>
+            <option>Shipment Picked Up</option>
+            <option>In Transit</option>
+            <option>Arrived at Facility</option>
+            <option>Out for Delivery</option>
+            <option>Delivered</option>
+            <option>Delivery Delayed</option>
+            <option>On Hold</option>
+        </select>
+
+        <label for="estimatedDelivery">Estimated delivery (optional)</label>
+        <input id="estimatedDelivery" type="date">
+
+        <button type="submit">Generate Code & Create Shipment</button>
+    </form>
+
+    <div id="createMessage" aria-live="polite"></div>
+
+    <hr>
+
+    <h3>Manage Shipments</h3>
+    <button type="button" class="secondary" id="refreshButton">
+        Refresh Shipments
+    </button>
+
+    <div id="shipmentList"></div>
+</section>
+
 </main>
 
 <footer>
-  Shipment Tracking Portal · Demonstration
+    Shipment tracking service
 </footer>
 
 <script>
-const form = document.getElementById("trackingForm");
-const result = document.getElementById("result");
+const SUPABASE_URL = "https://vydlfjijefphzhdsnppb.supabase.co";
+const SUPABASE_KEY = "sb_publishable_lwtn_VjNIJ_pHuwc4D4eHQ_0jGpIPF-";
 
-form.addEventListener("submit", function(event) {
-  event.preventDefault();
+const db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_KEY
+);
 
-  const code = document
-    .getElementById("trackingCode")
-    .value.trim();
+const $ = id => document.getElementById(id);
 
-  result.style.display = "block";
+function showMessage(id, message) {
+    $(id).textContent = message;
+}
 
-  result.innerHTML = "";
+function escapeHTML(value) {
+    return String(value ?? "").replace(/[&<>"']/g, char => ({
+        "&": "&amp;",
+        "<": "&lt;",
+        ">": "&gt;",
+        '"': "&quot;",
+        "'": "&#39;"
+    })[char]);
+}
 
-  const message = document.createElement("p");
-
-  message.textContent =
-    "No live shipment record was found for tracking number: " + code;
-
-  result.appendChild(message);
-
-  const explanation = document.createElement("p");
-
-  explanation.textContent =
-    "This website is not yet connected to a shipment database. " +
-    "Connect a secure database to display verified shipment status, " +
-    "shipment history and estimated delivery dates.";
-
-  result.appendChild(explanation);
+$("openAdmin").addEventListener("click", () => {
+    $("loginSection").classList.toggle("hidden");
+    $("loginMessage").textContent = "";
 });
+
+$("cancelLogin").addEventListener("click", () => {
+    $("loginSection").classList.add("hidden");
+});
+
+$("trackingForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const code = $("trackingCode").value.trim();
+
+    if (!code) return;
+
+    showMessage("trackingResult", "Searching for your shipment...");
+
+    const { data, error } = await db.rpc("track_shipment", {
+        p_tracking_code: code
+    });
+
+    if (error) {
+        showMessage(
+            "trackingResult",
+            "We could not complete the search. Please try again later."
+        );
+        console.error(error);
+        return;
+    }
+
+    if (!data || data.length === 0) {
+        showMessage(
+            "trackingResult",
+            "Tracking code not found. Please check the code and try again."
+        );
+        return;
+    }
+
+    const shipment = data[0];
+    const result = $("trackingResult");
+    result.replaceChildren();
+
+    const box = document.createElement("div");
+    box.className = "result";
+
+    const title = document.createElement("h3");
+    title.textContent = "Shipment Found";
+    box.appendChild(title);
+
+    [
+        ["Tracking Code", shipment.tracking_code],
+        ["Destination", shipment.destination],
+        ["Status", shipment.status],
+        ["Estimated Delivery", shipment.estimated_delivery || "Not available"],
+        ["Last Updated", shipment.updated_at
+            ? new Date(shipment.updated_at).toLocaleString()
+            : "Not available"]
+    ].forEach(([label, value]) => {
+        const line = document.createElement("p");
+        const strong = document.createElement("strong");
+        strong.textContent = label + ": ";
+        line.appendChild(strong);
+        line.appendChild(document.createTextNode(value || "Not available"));
+        box.appendChild(line);
+    });
+
+    result.appendChild(box);
+});
+
+$("loginForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    showMessage("loginMessage", "Signing in...");
+
+    const { error } = await db.auth.signInWithPassword({
+        email: $("adminEmail").value.trim(),
+        password: $("adminPassword").value
+    });
+
+    if (error) {
+        showMessage(
+            "loginMessage",
+            "Login failed. Check your email and password, then try again."
+        );
+        return;
+    }
+
+    $("adminPassword").value = "";
+    $("loginSection").classList.add("hidden");
+
+    await checkAdmin();
+});
+
+async function checkAdmin() {
+    const { data: sessionData } = await db.auth.getSession();
+    const session = sessionData.session;
+
+    $("adminPanel").classList.add("hidden");
+    $("openAdmin").classList.remove("hidden");
+
+    if (!session) return;
+
+    const { data, error } = await db.rpc("is_shipment_admin");
+
+    if (error || data !== true) {
+        await db.auth.signOut();
+        showMessage(
+            "loginMessage",
+            "This account is not authorized to manage shipments."
+        );
+        $("loginSection").classList.remove("hidden");
+        return;
+    }
+
+    $("adminPanel").classList.remove("hidden");
+    $("openAdmin").classList.add("hidden");
+
+    await loadShipments();
+}
+
+$("logoutButton").addEventListener("click", async () => {
+    await db.auth.signOut();
+    $("adminPanel").classList.add("hidden");
+    $("openAdmin").classList.remove("hidden");
+    $("loginSection").classList.remove("hidden");
+    showMessage("loginMessage", "You have logged out.");
+});
+
+$("shipmentForm").addEventListener("submit", async event => {
+    event.preventDefault();
+
+    const button = $("shipmentForm").querySelector("button[type=submit]");
+    button.disabled = true;
+
+    try {
+        showMessage("createMessage", "Creating shipment...");
+
+        const randomPart = crypto.randomUUID()
+            .replace(/-/g, "")
+            .slice(0, 16)
+            .toUpperCase();
+
+        const trackingCode = "SHIP-" + randomPart;
+
+        const shipment = {
+            tracking_code: trackingCode,
+            customer_name: $("customerName").value.trim(),
+            parcel_description: $("parcelDescription").value.trim() || null,
+            origin: $("origin").value.trim() || null,
+            destination: $("destination").value.trim(),
+            status: $("shipmentStatus").value,
+            estimated_delivery: $("estimatedDelivery").value || null
+        };
+
+        const { error } = await db.from("shipments").insert(shipment);
+
+        if (error) {
+            showMessage(
+                "createMessage",
+                "Could not create shipment. Please try again."
+            );
+            console.error(error);
+            return;
+        }
+
+        showMessage(
+            "createMessage",
+            "Shipment created! Tracking code: " + trackingCode
+        );
+
+        $("shipmentForm").reset();
+        await loadShipments();
+
+    } finally {
+        button.disabled = false;
+    }
+});
+
+async function loadShipments() {
+    const list = $("shipmentList");
+    list.textContent = "Loading shipments...";
+
+    const { data, error } = await db
+        .from("shipments")
+        .select("*")
+        .order("created_at", { ascending: false });
+
+    if (error) {
+        list.textContent =
+            "Unable to load shipments. Please check your admin access.";
+        console.error(error);
+        return;
+    }
+
+    list.replaceChildren();
+
+    if (!data || data.length === 0) {
+        list.textContent = "No shipments have been created yet.";
+        return;
+    }
+
+    data.forEach(shipment => {
+        const item = document.createElement("div");
+        item.className = "shipment";
+
+        item.innerHTML = `
+            <strong>${escapeHTML(shipment.tracking_code)}</strong>
+            <p>Customer: ${escapeHTML(shipment.customer_name)}</p>
+            <p>Destination: ${escapeHTML(shipment.destination)}</p>
+            <p>Status: ${escapeHTML(shipment.status)}</p>
+            <label>Update status</label>
+            <select class="statusSelect">
+                ${[
+                    "Shipment Registered",
+                    "Shipment Picked Up",
+                    "In Transit",
+                    "Arrived at Facility",
+                    "Out for Delivery",
+                    "Delivered",
+                    "Delivery Delayed",
+                    "On Hold"
+                ].map(status => `
+                    <option ${status === shipment.status ? "selected" : ""}>
+                        ${escapeHTML(status)}
+                    </option>
+                `).join("")}
+            </select>
+            <button type="button" class="updateButton">Save Status</button>
+            <button type="button" class="danger deleteButton">Delete Shipment</button>
+        `;
+
+        item.querySelector(".updateButton").addEventListener("click", async () => {
+            const newStatus = item.querySelector(".statusSelect").value;
+
+            const { error } = await db
+                .from("shipments")
+                .update({
+                    status: newStatus,
+                    updated_at: new Date().toISOString()
+                })
+                .eq("id", shipment.id);
+
+            if (error) {
+                alert("Status update failed. Please try again.");
+                console.error(error);
+                return;
+            }
+
+            alert("Shipment status updated.");
+            await loadShipments();
+        });
+
+        item.querySelector(".deleteButton").addEventListener("click", async () => {
+            if (!confirm(
+                "Are you sure you want to delete tracking code " +
+                shipment.tracking_code + "?"
+            )) return;
+
+            const { error } = await db
+                .from("shipments")
+                .delete()
+                .eq("id", shipment.id);
+
+            if (error) {
+                alert("Shipment could not be deleted.");
+                console.error(error);
+                return;
+            }
+
+            await loadShipments();
+        });
+
+        list.appendChild(item);
+    });
+}
+
+$("refreshButton").addEventListener("click", loadShipments);
+
+db.auth.onAuthStateChange(() => {
+    setTimeout(checkAdmin, 0);
+});
+
+checkAdmin();
 </script>
 
 </body>
